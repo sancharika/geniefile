@@ -122,7 +122,7 @@ class Functions():
         # saving the document in the vector store
         db.save_local(file_path)
         st.toast("File uploaded To Vector DataBase!", icon="✅")
-        # add_graph(docs, graph_model)    
+        add_graph(docs, graph_model)    
     
     @staticmethod
     def retrieve_answers(query, llm, data, gemini_embeddings, file_path="saved_embeddings"):
