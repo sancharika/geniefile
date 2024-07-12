@@ -13,6 +13,8 @@ pinned: false
 
 an ai-doc app that can answer evething
 
+![geniefile](final geniefile image.jpg)
+
 **project vision:** to create a revolutionary ai-powered document assistant, a "magic lamp" for unlocking the secrets within your files.
 
 **project goal:** develop a retrieval-augmented generation (rag) application, "genie file," that seamlessly integrates advanced information retrieval and natural language processing (nlp) techniques to deliver exceptional capabilities:
@@ -30,7 +32,7 @@ an ai-doc app that can answer evething
 * **knowledge graph integration:** neo4j provides a robust framework for representing and understanding the relationships between concepts in your documents.
 * **retrieval-rugmented generation:** the rag approach merges information retrieval with nlp-powered generation to deliver informative answers, summaries, and reports.
 * **customizable knowledge graph:** adapt "genie file" to your domain by defining custom entities, relationships, and knowledge relevant to your field.
-
+![neo4j](visualisation (1).png)
 **potential applications:**
 
 * **research and analysis:** streamline your research process by efficiently querying documents, generating summaries, and extracting key findings.
