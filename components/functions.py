@@ -7,7 +7,6 @@ from neo4j import GraphDatabase
 # from convert import ExtractPDFText
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
-from components import docLoader, functions
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain_community.document_loaders.telegram import text_to_docs
 from langchain_community.vectorstores import FAISS

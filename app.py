@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_experimental.graph_transformers import LLMGraphTransformer
-from langchain_openai import ChatOpenAI , OpenAIEmbeddings
 from langchain_core.documents import Document
 from langchain_groq import ChatGroq
 
