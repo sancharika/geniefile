@@ -56,7 +56,11 @@ demo = st.toggle("Try Example")
 input_demo = ""
 if demo:
     #read document file paper
-    uploaded_file = r'.\file\Paper35.pdf'
+    # Get the current working directory
+    current_dir = os.getcwd()
+
+    # Construct the path to the file
+    uploaded_file = os.path.join(current_dir, 'file', 'Paper35.pdf')
     docs_loader = docLoader(uploaded_file)
     docs = docs_loader.load_pdf()
     input_demo = "Tell me about this doc"
