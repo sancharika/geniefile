@@ -2,6 +2,7 @@ import streamlit as st
 import pdfplumber
 import docx
 import pylatexenc
+import base64
 from langchain_community.document_loaders.telegram import text_to_docs
 
 
@@ -52,10 +53,46 @@ class docLoader():
             tex_content = tex_file.read()
         return pylatexenc.latex2text(tex_content)
 
-def load_doc():
-    uploaded_file = st.file_uploader("Choose a document file", type=["pdf", "txt", "docx"])
-    loader = docLoader(uploaded_file)
-    return loader.load()
+    def display_doc(self):
+        st.markdown("### Document Preview")
+        if isinstance(self.uploaded_file, str):
+            file_extension = self.uploaded_file.split(".")[-1]
+        else:
+            file_extension = self.uploaded_file.name.split(".")[-1]
 
+        if file_extension == "pdf":
+            if isinstance(self.uploaded_file, str):
+                with open(self.uploaded_file, "rb") as file:
+                    base64_doc = base64.b64encode(file.read()).decode("utf-8")
+            else:
+                base64_doc = base64.b64encode(self.uploaded_file.getvalue()).decode("utf-8")
+
+            doc_display = f"""<iframe src="data:application/pdf;base64,{base64_doc}" width="400" height="100%" type="application/pdf"
+                                style="height:100vh; width:100%" />
+                            """
+
+        elif file_extension == "txt":
+            text = self.load_txt()
+            base64_doc = base64.b64encode(text.encode("utf-8")).decode("utf-8")
+            doc_display = f"""<iframe src="data:text/plain;base64,{base64_doc}" width="400" height="100%" style="height:100vh; width:100%">
+                            </iframe>"""
+
+        elif file_extension == "docx":
+            text = self.load_docx()
+            base64_doc = base64.b64encode(text.encode("utf-8")).decode("utf-8")
+            doc_display = f"""<iframe src="data:text/plain;base64,{base64_doc}" width="400" height="100%" style="height:100vh; width:100%">
+                            </iframe>"""
+
+        elif file_extension == "tex":
+            text = self.load_tex()
+            base64_doc = base64.b64encode(text.encode("utf-8")).decode("utf-8")
+            doc_display = f"""<iframe src="data:text/plain;base64,{base64_doc}" width="400" height="100%" style="height:100vh; width:100%">
+                            </iframe>"""
+
+        else:
+            doc_display = "Unsupported file format"
+
+        st.markdown(doc_display, unsafe_allow_html=True)
 if __name__ == "__main__":
-    load_doc()
+    uploaded_file = st.file_uploader("Choose a document file", type=["pdf", "txt", "docx"])
+    docLoader(uploaded_file).load()
