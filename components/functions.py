@@ -78,6 +78,7 @@ class Functions():
         if os.path.exists(file_path+'\index.pkl'):
         # Delete the file
             os.remove(file_path+'\index.pkl')
+        st.toast("File Deleted from Vector DataBase!", icon="⚠️")
 
         # delete the graph
         uri = os.getenv("NEO4J_URI") 
@@ -87,7 +88,7 @@ class Functions():
         with driver.session() as session:
                 session.run("MATCH (n) DETACH DELETE n")
         driver.close()
-        print("Graph deleted successfully")
+        st.toast("File deleted From Knowledge Graph!", icon="⚠️")
     
     @staticmethod
     def add_data(data, gemini_embeddings, graph_model, file_path="saved_embeddings"):
@@ -121,7 +122,7 @@ class Functions():
         # saving the document in the vector store
         db.save_local(file_path)
         st.toast("File uploaded To Vector DataBase!", icon="✅")
-        # add_graph(docs, graph_model)    
+        add_graph(docs, graph_model)    
     
     @staticmethod
     def retrieve_answers(query, llm, data, gemini_embeddings, file_path="saved_embeddings"):
