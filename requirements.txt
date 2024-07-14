@@ -21,6 +21,7 @@ python-docx
 python-dotenv
 SpeechRecognition
 streamlit
+streamlit-analytics
 tesseract
 torch
 transformers

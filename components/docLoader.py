@@ -68,8 +68,8 @@ class docLoader():
                 base64_doc = base64.b64encode(self.uploaded_file.getvalue()).decode("utf-8")
 
             doc_display = f"""<iframe src="data:application/pdf;base64,{base64_doc}" width="400" height="100%" type="application/pdf"
-                                style="height:100vh; width:100%">
-                            </iframe>"""
+                                style="height:100vh; width:100%" />
+                            """
 
         elif file_extension == "txt":
             text = self.load_txt()

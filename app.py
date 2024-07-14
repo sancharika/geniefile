@@ -11,6 +11,10 @@ from langchain_core.documents import Document
 from langchain_groq import ChatGroq
 
 
+st.set_page_config(page_title="geniefile", page_icon='🗃️', layout='wide')
+
+
+
 
 # Load environment variables
 load_dotenv()
@@ -42,7 +46,6 @@ class LLMModel(object):
 llm_model = LLMModel()
 func = functions.Functions()
 # Set Streamlit page configuration
-st.set_page_config(page_title="geniefile", page_icon='🗃️', layout='wide')
 
 # Main title
 st.title('🪄 GenieFile 🪄')

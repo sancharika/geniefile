@@ -161,7 +161,7 @@ class Functions():
             embedding_node_property="embedding"
         )
         
-        results = vector_index.similarity_search(query, k=1)
+        # results = vector_index.similarity_search(query, k=1)
 
         qa_chain = RetrievalQAWithSourcesChain.from_chain_type(
     llm, chain_type="stuff", retriever=vector_index.as_retriever()
@@ -170,6 +170,6 @@ class Functions():
     {"question": query},
     return_only_outputs=True,
 )
-        print("----------------similarity_search_with_score: ",vector_index.similarity_search_with_score(query))
+        # print("----------------similarity_search_with_score: ",vector_index.similarity_search_with_score(query))
         return response, result['answer'].split('FINAL ANSWER:')[-1]
 
