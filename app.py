@@ -6,8 +6,8 @@ from components.docLoader import docLoader
 from dotenv import load_dotenv
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain_experimental.graph_transformers import LLMGraphTransformer
-from langchain_core.documents import Document
+# from langchain_experimental.graph_transformers import LLMGraphTransformer
+# from langchain_core.documents import Document
 from langchain_groq import ChatGroq
 
 
@@ -79,15 +79,6 @@ else:
     
 st.session_state['doc_text'] = docs
 
-doc = st.columns(1)
-if docs: 
-    # with doc:
-        extracted= st.text_area("Extracted Data", value=st.session_state['doc_text'])
-
-
-        
-input_text = st.text_input("Enter Your Question", input_demo)
-
 
 # Sidebar options
 with st.sidebar:    
@@ -101,8 +92,9 @@ with st.sidebar:
     with delete:
         reset = st.button("Reset Database", type="primary")
     
-    submit=st.button('Shoot your Question!')
-
+    if docs:
+        extracted= st.text_area("Extracted Data", value=st.session_state['doc_text'])
+        
     if st.session_state['doc_text']:
         docs_loader.display_doc()
 
@@ -116,13 +108,50 @@ if reset:
         with st.spinner("Deleting Data from Database. Please wait it may take more than couple minutes.."):
             func.delete_db()
         st.warning('Database reset Successful', icon="🗑️")
-        
+            
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+    st.session_state.demo_processed = False
+
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Add the demo message to chat history and display it
+if input_demo and not st.session_state.demo_processed:
+    st.session_state.messages.append({"role": "user", "content": input_demo})
+    with st.chat_message("user"):
+        st.markdown(input_demo)
+
+    # Generate and display a response for the demo input
+    with st.spinner("Loading Answer..."):
+
+        response = func.retrieve_answers(input_demo, llm, docs, embeddings)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    with st.chat_message("assistant"):
+        st.write_stream(func.response_generator(response))
+
+    # Mark demo message as processed
+    st.session_state.demo_processed = True
+
+
+# React to user input
+if prompt := st.chat_input("Shoot your question?"):
+    print(st.session_state.demo_processed)
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(prompt)
     
+    # Generate and display a response for the demo input
+    with st.spinner("Loading Answer..."):
 
-if submit or input_text:
-            answer, graph_answer = func.retrieve_answers(input_text, llm, docs, embeddings)
-            print(answer)
-            st.write("Answer generated from Knowledge Graph: "+graph_answer)
-            st.write("Answer generated from FAISS: "+answer)
+        response = func.retrieve_answers(prompt, llm, docs, embeddings)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    with st.chat_message("assistant"):
+        st.write_stream(func.response_generator(response))
 
-
+    
