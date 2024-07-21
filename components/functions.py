@@ -1,10 +1,11 @@
 #fucntions.py
 import os
+import time
 import pyperclip
 import streamlit as st
 import speech_recognition as sr
 from neo4j import GraphDatabase
-# from convert import ExtractPDFText
+from transformers import pipeline, AutoTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chains import RetrievalQAWithSourcesChain
@@ -128,7 +129,9 @@ class Functions():
     def retrieve_answers(query, llm, data, gemini_embeddings, file_path="saved_embeddings"):
         def format_docs(docs):
             return "\n\n".join(doc.page_content for doc in text_to_docs(data))
-                
+        
+        tokenizer = AutoTokenizer.from_pretrained('google-bert/bert-base-uncased')
+        #generate answer from vector db FAISS
         # reloading the documents from the vector store
         new_db = FAISS.load_local(folder_path=file_path, embeddings =gemini_embeddings,
                                     allow_dangerous_deserialization = True)
@@ -161,15 +164,38 @@ class Functions():
             embedding_node_property="embedding"
         )
         
-        # results = vector_index.similarity_search(query, k=1)
+        # generate answr from knowledge graph
 
         qa_chain = RetrievalQAWithSourcesChain.from_chain_type(
-    llm, chain_type="stuff", retriever=vector_index.as_retriever()
-)
+            llm, chain_type="stuff", retriever=vector_index.as_retriever()
+        )
         result = qa_chain.invoke(
-    {"question": query},
-    return_only_outputs=True,
-)
-        # print("----------------similarity_search_with_score: ",vector_index.similarity_search_with_score(query))
-        return response, result['answer'].split('FINAL ANSWER:')[-1]
+            {"question": query},
+            return_only_outputs=True,
+        )
+        #unifying answers
+        
+        faiss_answer = response
+        graph_answer = result['answer'].split('FINAL ANSWER:')[-1]
+        # Combine both answers
+        combined_answer = faiss_answer + " " + graph_answer
+        
+        combined_tokens = tokenizer(combined_answer, return_tensors="pt").input_ids.shape[1]
+        faiss_tokens = tokenizer(faiss_answer, return_tensors="pt").input_ids.shape[1]
+        graph_tokens = tokenizer(graph_answer, return_tensors="pt").input_ids.shape[1]
+        
+        # Use a summarizer to merge the content and remove redundancy
+        summarizer = pipeline("summarization")
+        summary = summarizer(combined_answer, max_length=combined_tokens, min_length=max(faiss_tokens, graph_tokens), do_sample=False)
+        
+        final_answer = summary[0]['summary_text']
+        
+        return final_answer
+    
+    @staticmethod
+    # Streamed response emulator
+    def response_generator(response):
+        for word in response.split():
+            yield word + " "
+            time.sleep(0.05)
 
